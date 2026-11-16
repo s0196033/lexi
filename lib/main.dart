@@ -71,9 +71,18 @@ class _MainScreenState extends State<MainScreen> {
       body: selectedIndex == 0
           ? const DictionaryScreen()
           : selectedIndex == 1
-          ? const DecksScreen()
+          ? DecksScreen(
+              onStartStudy: (studyWords) {
+                setState(() {
+                  selectedStudyWords = studyWords;
+                  selectedIndex = 2;
+                });
+              },
+            )
           : selectedIndex == 2
-          ? const StudyScreen()
+          ? StudyScreen(
+              studyWords: selectedStudyWords ?? words,
+            )
           : Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -531,7 +540,12 @@ const List<Deck> decks = [
 
 
 class DecksScreen extends StatelessWidget {
-  const DecksScreen({super.key});
+  final void Function(List<Word>) onStartStudy;
+
+  const DecksScreen({
+    super.key,
+    required this.onStartStudy,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -578,18 +592,7 @@ class DecksScreen extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => DeckDetailScreen(
                     deck: deck,
-                    onStartStudy: (studyWords) {
-                      Navigator.pop(context);
-                      final mainState = context
-                          .findAncestorStateOfType<_MainScreenState>();
-
-                      if (mainState != null) {
-                        mainState.setState(() {
-                          mainState.selectedStudyWords = studyWords;
-                          mainState.selectedIndex = 2;
-                        });
-                      }
-                    },
+                    onStartStudy: onStartStudy,
                   ),
                 ),
               );
@@ -634,15 +637,7 @@ class DeckDetailScreen extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  final mainState = context
-                      .findAncestorStateOfType<_MainScreenState>();
-
-                  if (mainState != null) {
-                    mainState.setState(() {
-                      mainState.selectedStudyWords = deckWords;
-                      mainState.selectedIndex = 2;
-                    });
-                  }
+                  onStartStudy(deckWords);
                 },
                 child: const Text('Начать обучение'),
               ),
