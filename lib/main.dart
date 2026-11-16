@@ -349,6 +349,7 @@ class _StudyScreenState extends State<StudyScreen> {
   bool showTranslation = false;
   int knownWords = 0;
   int unknownWords = 0;
+  bool isStudyFinished = false;
 
   @override
   Widget build(BuildContext context) {
@@ -460,10 +461,17 @@ class _StudyScreenState extends State<StudyScreen> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
+                    if (isStudyFinished) return;
+
                     setState(() {
                       knownWords++;
-                      currentCardIndex = (currentCardIndex + 1) % widget.studyWords.length;
-                      showTranslation = false;
+
+                      if (currentCardIndex < widget.studyWords.length - 1) {
+                        currentCardIndex++;
+                        showTranslation = false;
+                      } else {
+                        isStudyFinished = true;
+                      }
                     });
                   },
                   child: const Text('Знаю'),
