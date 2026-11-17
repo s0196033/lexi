@@ -353,6 +353,50 @@ class _StudyScreenState extends State<StudyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isStudyFinished) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Результаты обучения'),
+          backgroundColor: const Color(0xFFFFF9F2),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.emoji_events,
+                size: 80,
+                color: Color(0xFFE99A56),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Обучение завершено!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 30),
+              Text('Знаю: $knownWords'),
+              Text('Не знаю: $unknownWords'),
+              const SizedBox(height: 30),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    currentCardIndex = 0;
+                    knownWords = 0;
+                    unknownWords = 0;
+                    showTranslation = false;
+                    isStudyFinished = false;
+                  });
+                },
+                child: const Text('Пройти ещё раз'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     final word = widget.studyWords[currentCardIndex];
 
     return Padding(
@@ -481,10 +525,17 @@ class _StudyScreenState extends State<StudyScreen> {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
+                    if (isStudyFinished) return;
+
                     setState(() {
                       unknownWords++;
-                      currentCardIndex = (currentCardIndex + 1) % words.length;
-                      showTranslation = false;
+
+                      if (currentCardIndex < widget.studyWords.length - 1) {
+                        currentCardIndex++;
+                        showTranslation = false;
+                      } else {
+                        isStudyFinished = true;
+                      }
                     });
                   },
                   child: const Text('Не знаю'),
