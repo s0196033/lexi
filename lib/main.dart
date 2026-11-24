@@ -350,6 +350,7 @@ class _StudyScreenState extends State<StudyScreen> {
   int knownWords = 0;
   int unknownWords = 0;
   bool isStudyFinished = false;
+  List<Word> difficultWords = [];
 
   @override
   Widget build(BuildContext context) {
@@ -380,12 +381,34 @@ class _StudyScreenState extends State<StudyScreen> {
               Text('Знаю: $knownWords'),
               Text('Не знаю: $unknownWords'),
               const SizedBox(height: 30),
+              if (difficultWords.isNotEmpty) ...[
+                const Text(
+                  'Слова для повторения:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF694832),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ...difficultWords.map(
+                      (word) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      '${word.english} — ${word.translation}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
                   setState(() {
                     currentCardIndex = 0;
                     knownWords = 0;
                     unknownWords = 0;
+                    difficultWords.clear();
                     showTranslation = false;
                     isStudyFinished = false;
                   });
@@ -529,6 +552,7 @@ class _StudyScreenState extends State<StudyScreen> {
 
                     setState(() {
                       unknownWords++;
+                      difficultWords.add(widget.studyWords[currentCardIndex]);
 
                       if (currentCardIndex < widget.studyWords.length - 1) {
                         currentCardIndex++;
@@ -749,4 +773,3 @@ class DeckDetailScreen extends StatelessWidget {
     );
   }
 }
-
